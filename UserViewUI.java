@@ -54,6 +54,7 @@ public class UserViewUI {
         //Display following list in a listview
         ListView followlist = new ListView(user.getFollowingList());
         followlist.setPrefHeight(50);
+        
         //TextArea and button for posting tweet
         TextArea writeTweet=new TextArea();
         writeTweet.setWrapText(true);
@@ -66,22 +67,26 @@ public class UserViewUI {
         postTweet.setOnAction((ActionEvent event)-> {
             String tweet=writeTweet.getText();
             user.tweetMessage(tweet);
-            
             writeTweet.clear();
         });
         //ListView for newsFeed
         ListView newsFeedList = new ListView(user.getNewsFeedList());
-        newsFeedList.setPrefHeight(50);
+        newsFeedList.setPrefHeight(100);
                 
         Label newsFeed=new Label("News Feed");
         Label currentfollow=new Label("Currently Following");
+        
+        //label for user creation time and last updated of all users
+        Label creation=new Label("User's Creation Time: " + user.getCreationTime());
         
         //Place buttons, Listview, label, textfield/area into proper layout
         HBox followUserOption=new HBox(10,userIDText, follow);
         HBox tweetOption=new HBox(10, writeTweet, postTweet);
         tweetOption.setAlignment(Pos.BOTTOM_CENTER);
-        menuBox=new VBox(10,followUserOption, currentfollow, followlist, 
-                tweetOption, newsFeed, newsFeedList);
+        
+        //Add new User's creation time label
+        menuBox=new VBox(10, creation, followUserOption, currentfollow, 
+                followlist, tweetOption, newsFeed, newsFeedList);
         
     }
     public VBox getMenuBox(){
