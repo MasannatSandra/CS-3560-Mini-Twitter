@@ -8,20 +8,33 @@ public class GroupContainer implements CompositeTree{
     
     private List<CompositeTree> groupUsers= new ArrayList<>();
     private String groupID;
+    private Long createdGroup;
     
     //verify ID haven't already been used
+    //Set group ID and the time of created Group each time a new one is made
     public GroupContainer(String newID) {
         this.groupID = newID;
+        this.createdGroup=System.currentTimeMillis();
     }
     
     @Override
     public String getID() {
         return this.groupID;
     }
+    public List<CompositeTree> getGroupUsers(){
+        return groupUsers;
+    }
 
     @Override
     public String toString() {
         return groupID;
+    }
+    //getter and setter methods for creationtime for group
+    public long getCreationTime(){
+        return createdGroup;
+    }
+    public void setCreationTime(){
+        createdGroup=System.currentTimeMillis();
     }
     
     @Override
@@ -36,7 +49,7 @@ public class GroupContainer implements CompositeTree{
         }
     }
     //Everytime a group is added, display in the Tree
-    public void addGroupMember(CompositeTree newGroup){
+    public void addGroupUsers(CompositeTree newGroup){
         this.groupUsers.add(newGroup);
     }
     //Verify a group contain a user ID
@@ -93,5 +106,5 @@ public class GroupContainer implements CompositeTree{
             }
         }
         return null;
-    }   
+    } 
 }
