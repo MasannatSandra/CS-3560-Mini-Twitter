@@ -12,6 +12,7 @@ import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
+import twitterdriver.Visitor.LastUpdatedIDVisitor;
 import twitterdriver.Visitor.PositiveVisitor;
 import twitterdriver.Visitor.TotalGroupVisitor;
 import twitterdriver.Visitor.TotalMessageVisitor;
@@ -59,8 +60,10 @@ public class AdminPanel{
                 informationAlert.showAndWait();
             }
             else{
+                //set value of when User ID was created
                 UserLeaf temp = new UserLeaf(newUserInput);
-                ((GroupContainer) selectedUser.getValue()).addGroupMember(temp);
+                //temp.setCreationTime();
+                ((GroupContainer) selectedUser.getValue()).addGroupUsers(temp);
                 selectedUser.getChildren().add(new TreeItem<>(temp));
             }
             UserIDText.clear();
@@ -82,11 +85,48 @@ public class AdminPanel{
                 informationAlert.showAndWait();
             }
             else{
-                ((GroupContainer) selectedGroup.getValue()).addGroupMember(temp);
+                //set value of when this group ID was created
+                temp.setCreationTime();
+                ((GroupContainer) selectedGroup.getValue()).addGroupUsers(temp);
                 selectedGroup.getChildren().add(new TreeItem<>(temp, new ImageView(rootPic)));
             }
             GroupIDText.clear();
         });
+        //Validate IDs
+        Button validateIDs=new Button();
+        validateIDs.setText("Validate IDs");
+        //tell specific reasons for a invalid ID
+        validateIDs.setOnAction((ActionEvent event) -> {
+            String newGroup= GroupIDText.getText();
+            
+            String newUser= UserIDText.getText();
+            
+            //doesn't allow two of the same ID, invalid
+            if(rootGroup.containsGroup(newGroup) || rootGroup.containsUser(newUser)){
+                informationAlert.setContentText("Invalid, can't have two of the same ID!");
+                informationAlert.showAndWait();
+            }
+            //doesn't allow spaces in IDs, invalid
+            else if(newGroup.contains(" ") || newUser.contains(" ")){
+                informationAlert.setContentText("Invalid, ID can not contain spaces!");
+                informationAlert.showAndWait();
+            }
+            //if IDs aren't a duplicate, it is valid
+            else if(!rootGroup.containsGroup(newGroup) || !rootGroup.containsUser(newUser)){
+                informationAlert.setContentText("Valid, the ID has not been used!");
+                informationAlert.showAndWait();
+            }
+        });
+        //Display ID of the last updated user
+        Button LastUpdatedUser=new Button("Last Updated User's ID");
+        LastUpdatedUser.setOnAction((ActionEvent event) -> {
+            LastUpdatedIDVisitor updatedIDVisitor=new LastUpdatedIDVisitor();
+            rootGroup.accept(updatedIDVisitor);
+            informationAlert.setContentText("User's last updated: " 
+                    + updatedIDVisitor.getLastUpdateUser()); 
+            informationAlert.showAndWait();
+        });
+
         //Open User View button
         Button userView = new Button();
         userView.setText("Open User View");
@@ -154,13 +194,16 @@ public class AdminPanel{
         HBox groupBox = new HBox(10, GroupIDText, addgroup);
         HBox UserGroupBox = new HBox(10, usertotal, grouptotal);
         HBox MessagePositiveBox = new HBox(10, messagetotal, positive);
-        HBox userButton=new HBox(userView);
-        userButton.setAlignment(Pos.CENTER);
-        VBox topButtons = new VBox(10, userBox, groupBox, userButton, UserGroupBox, 
+        
+        VBox UserButtons=new VBox(10, validateIDs, LastUpdatedUser, userView);
+        UserButtons.setAlignment(Pos.CENTER);
+        
+        VBox topButtons = new VBox(10, userBox, groupBox, UserButtons, UserGroupBox, 
                 MessagePositiveBox);
         VBox bottomButtons=new VBox(10, UserGroupBox, MessagePositiveBox);
         VBox allButtons=new VBox(10, topButtons, bottomButtons);
-        allButtons.setSpacing(200);
+        
+        allButtons.setSpacing(170);
         menuBox = new HBox(10, treeBox, allButtons);
         menuBox.setPadding(new Insets(10));
 
