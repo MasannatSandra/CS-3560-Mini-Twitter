@@ -18,9 +18,13 @@ public class UserLeaf extends UserSubject implements CompositeTree, UserObserver
    //According to oracle docs a ObservableList is a list that allows listeners 
    //to track changes when they occur, aka update user view's newsfeed
    private ObservableList<String> newsFeedList = FXCollections.observableList(newsFeed);
-   
+   private long createdUser;
+   private long lastUpdatedTime=0;
+    
+   //Set ID of User and created User
     public UserLeaf(String newID) {
         this.userID = newID;
+        this.createdUser=System.currentTimeMillis();
     }
     
     @Override
@@ -31,6 +35,14 @@ public class UserLeaf extends UserSubject implements CompositeTree, UserObserver
     @Override
     public String toString() {
         return userID;
+    }
+    
+    //setter and getter method for creationtime for user
+    public long getCreationTime(){
+        return createdUser;
+    }
+    public long getLastUpdatedTime(){
+        return lastUpdatedTime;
     }
 
     @Override
@@ -43,9 +55,11 @@ public class UserLeaf extends UserSubject implements CompositeTree, UserObserver
     public void update(UserSubject subject, String tweet) {
         if (subject instanceof UserLeaf) {
             this.newsFeedList.add("-" + ((UserLeaf) subject).getID() + " : " + tweet);
+            //Updated the last updated time to others' (usubject) newsfeed
+            lastUpdatedTime=System.currentTimeMillis();
+            this.newsFeedList.add("Last Updated: " + lastUpdatedTime);
         }
     }
-
     public ObservableList<UserLeaf> getFollowingList() {
         return followingList;
     }
@@ -66,8 +80,11 @@ public class UserLeaf extends UserSubject implements CompositeTree, UserObserver
         myTweets.add(tweet);
         //add tweet to self's newsfeed
         newsFeedList.add("-" + this.userID + " : " + tweet);
+        //update last updated time to own's newfeed in real time
+        lastUpdatedTime=System.currentTimeMillis();
+        //set(index, tweet string)
+        this.newsFeedList.add("Last Updated: " + lastUpdatedTime);
         //Also add tweet to other user's (followers) newsfeed
         updateFollowers(tweet);
     }
-
 }
